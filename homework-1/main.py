@@ -15,16 +15,6 @@ def read_employees(file):
             notes = i['notes']
             data_emp.append((first_name, last_name, title, notes))
         return data_emp
-conn = psycopg2.connect(host='localhost', database='north', user='postgres', password='marinaok481')
-
-try:
-    with conn:
-        with conn.cursor() as cur:
-            data_emp = read_employees('./north_data/employees_data.csv')
-            for i in data_emp:
-                cur.execute('INSERT INTO employees (first_name, last_name, title, notes) VALUES (%s, %s, %s, %s)',i)
-finally:
-     conn.close()
 
 
 def read_customers(file):
@@ -37,16 +27,6 @@ def read_customers(file):
             contact_name = i['contact_name']
             data_customers.append((customer_id, company_name, contact_name))
         return data_customers
-
-
-try:
-    with conn:
-        with conn.cursor() as cur:
-            data_customers = read_customers('./north_data/customers_data.csv')
-            for i in data_customers:
-                cur.execute('INSERT INTO customers VALUES (%s, %s, %s)', i)
-finally:
-     conn.close()
 
 
 def read_orders(file):
@@ -63,11 +43,19 @@ def read_orders(file):
         return data_orders
 
 
+conn = psycopg2.connect(host='localhost', database='north', user='postgres', password='marinaok481')
 try:
     with conn:
         with conn.cursor() as cur:
-            data_customers = read_orders('./north_data/orders_data.csv')
+            data_emp = read_employees('./north_data/employees_data.csv')
+            for i in data_emp:
+                cur.execute('INSERT INTO employees (first_name, last_name, title, notes) VALUES (%s, %s, %s, %s)', i)
+            data_customers = read_customers('./north_data/customers_data.csv')
             for i in data_customers:
+                cur.execute('INSERT INTO customers VALUES (%s, %s, %s)', i)
+            data_orders = read_orders('./north_data/orders_data.csv')
+            for i in data_orders:
                 cur.execute('INSERT INTO orders VALUES (%s, %s, %s, %s, %s)', i)
 finally:
      conn.close()
+
